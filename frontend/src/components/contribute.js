@@ -7,49 +7,12 @@ import {
     Col,
     Row
 } from 'react-bootstrap';
+import {
+    TreasuryAddress,
+    TreasuryABI
+} from '../constants/treasury-const';
 
-const TreasuryAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-const TreasuryABI = [
-    {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "inputs": [],
-      "name": "contributeFunds",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getTotalFunds",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ]
 
 class Contribute extends React.Component {
     constructor(props) {
@@ -72,7 +35,7 @@ class Contribute extends React.Component {
         e.preventDefault();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
+        console.log("Accounts: ", accounts);
     }
 
     //TODO: This is probably wrong haha... but whatever
@@ -85,6 +48,7 @@ class Contribute extends React.Component {
         const transaction = await TreasuryWithSigner.contributeFunds({
             value: ethers.utils.parseEther(this.state.form.contributionAmount.toString())
         })
+        console.log("Transaction: ", transaction);
     }
 
     async handleGetTotalFunds(e) {
