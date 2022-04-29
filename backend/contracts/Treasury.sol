@@ -5,13 +5,23 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Treasury {
 
-    //TODO: I got the basic version working, but to really get it to be right I need to figure out this whole decimal thing, I'm doing something wrong obviously.
 
     address public TREASURY_TOKEN;
+
+    struct Proposal {
+        uint index;
+        string name;
+        uint256 voteCount;
+    }
+
+    Proposal[] public proposals;
 
     address public owner;
     uint totalFunds;
     mapping (address => uint256) public rewardBalances;
+    mapping (uint => uint256) public yesVotes;
+    mapping (uint => uint256) public noVotes;
+    mapping (uint => mapping(address => bool)) alreadyVoted;
 
     modifier onlyOwner {
         require(msg.sender == owner, "Only the owner can access this function");
@@ -21,6 +31,26 @@ contract Treasury {
     constructor () {
         owner = msg.sender;
         totalFunds = 0;
+        proposals.push(Proposal({
+            index: 0,
+            name: "Uniswap Liquidity Proposal"
+        }));
+    }
+
+    function voteForProposal(uint _index, bool _vote) public {
+        require(IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender)) >0, "Only token holders can vote");
+        require(alreadyVoted[i][msg.sender] == true, "You have already voted for this proposal");
+        if(_vote) {
+            alreadyVoted[i][msg.sender] = false;
+            yesVotes[i] += IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender));
+        } else if (!_vote) {
+            alreadyVoted[i][msg.sender] = false;
+            noVotes[i] += IERC20(TREASURY_TOKEN.balanceOf(address(msg.sender)));
+        }
+    }
+
+    function getVoteCountsForProposals(uint _index) public returns (uint256, uint256) {
+        return (yesVotes[i], noVotes[i]);
     }
 
     function setTreasuryTokenContractAddress(address _tokenContractAddress) public onlyOwner {
