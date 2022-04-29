@@ -26,16 +26,8 @@ class Contribute extends React.Component {
         }
 
         this.handleContribute = this.handleContribute.bind(this);
-        this.handleConnectWallet = this.handleConnectWallet.bind(this);
         this.handleContributionChange = this.handleContributionChange.bind(this);
         this.handleGetTotalFunds = this.handleGetTotalFunds.bind(this);
-    }
-
-    async handleConnectWallet(e) {
-        e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        console.log("Accounts: ", accounts);
     }
 
     //TODO: This is probably wrong haha... but whatever
@@ -79,9 +71,7 @@ class Contribute extends React.Component {
                 <Row>
                     <Col md={4}>Treasury Value: {this.state.treasuryValue} ETH</Col>
                     <Col md={{ span: 4, offset: 4 }}>
-                        <Button onClick={this.handleConnectWallet}>
-                            Connect Wallet
-                        </Button>
+                        
                     </Col>
                 </Row>
                 
