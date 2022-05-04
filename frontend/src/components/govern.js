@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import React from 'react';
 import {
     Card,
@@ -8,24 +9,60 @@ import {
     ProgressBar,
     Form
 } from 'react-bootstrap';
+import getTreasuryWithSigner from '../utils/ethers-helpers';
 
 class Governance extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            showVote: false
+            showVote: false,
+            totalVotesAvailable: 0,
+            totalVotesMade: 60,
+            noVotes: 20,
+            yesVotes: 40,
+            voteSelect: "For"
         }
 
         this.handleShowVote = this.handleShowVote.bind(this);
+        this.handleVoteChange = this.handleVoteChange.bind(this);
+        this.handleVoteSubmit = this.handleVoteSubmit.bind(this);
     }
 
-    handleShowVote(e) {
+    async handleShowVote(e) {
         e.preventDefault();
         this.setState({
             showVote: true
         })
+        const TreasuryWithSigner = getTreasuryWithSigner();
+        const txn = await TreasuryWithSigner.getCirculatingSupply();
+        console.log("TXN: ", txn);
+        this.setState({
+            totalVotesAvailable: ethers.utils.formatUnits(txn, 18)
+        })
         console.log(this.state.showVote);
+    }
+
+    handleVoteChange(e) {
+        e.preventDefault();
+        console.log(e.target.value);
+        this.setState({
+            voteSelect: e.target.value
+        })
+    }
+
+    handleVoteSubmit(e) {
+        e.preventDefault();
+        if(this.state.voteSelect === "For") {
+            this.setState((prevState, props) => ({
+                yesVotes: prevState.yesVotes + 2
+            }))
+        } else {
+            this.setState((prevState, props) => ({
+                noVotes: prevState.noVotes + 2
+            }))
+        }
+        
     }
 
     render() {
@@ -36,7 +73,7 @@ class Governance extends React.Component {
                     <Row>
                         <Col sm={4}>
                     <Card style={{width: '18rem'}}>
-                        <Card.Img variant="top" src="https://via.placeholder.com/100x80"/>
+                        <Card.Img variant="top" src="./uniswap.png"/>
                         <Card.Body>
                             <Card.Title>Provide Liquidity to Uniswap for 4% return</Card.Title>
                             <Card.Text>
@@ -53,18 +90,21 @@ class Governance extends React.Component {
                         {this.state.showVote 
                         ? <Col sm={8}>
                             <p>For</p>
-                            <ProgressBar striped variant="success" now={40}/>
+                            <ProgressBar striped variant="success" now={this.state.yesVotes} label={`${this.state.yesVotes}%`}/>
                             <p>Against</p>
-                            <ProgressBar striped variant="danger" now={20} />
+                            <ProgressBar striped variant="danger" now={this.state.noVotes}  label={`${this.state.noVotes}%`} />
                             <br/>
                             <Form>
                                 <Form.Label>Cast Your Vote</Form.Label>
-                                <Form.Select>
+                                <Form.Select
+                                    onChange={this.handleVoteChange}
+                                    value={this.state.voteSelect}
+                                >
                                     <option value="For">For</option>
                                     <option value="Against">Against</option>
                                 </Form.Select>
                                 <br/>
-                                <Button style={{width: "24rem"}}>
+                                <Button onClick={this.handleVoteSubmit} style={{width: "24rem"}}>
                                     Vote
                                 </Button>
                             </Form>
