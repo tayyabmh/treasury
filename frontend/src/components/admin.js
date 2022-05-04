@@ -3,7 +3,11 @@ import React from 'react';
 import {
     Container,
     Form,
-    Button
+    Button,
+    Col,
+    Row,
+    InputGroup,
+    FormControl
 } from 'react-bootstrap';
 import {
     TreasuryAddress,
@@ -16,12 +20,43 @@ class Admin extends React.Component {
 
         this.state = {
             addressSelect: '',
-            rewardBalance: 0
+            rewardBalance: 0,
+            circulatingSupply: 0,
+            availableSupply: 0
         }
         
         this.handleSelectChange = this.handleSelectChange.bind(this);
         this.handleCheckRewardsBalance = this.handleCheckRewardsBalance.bind(this);
         this.handleDistributeRewards = this.handleDistributeRewards.bind(this);
+        this.checkAvailableSupply = this.checkAvailableSupply.bind(this);
+        this.checkCirculatingSupply = this.checkCirculatingSupply.bind(this);
+    }
+
+
+    async checkAvailableSupply(e) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
+        const signer = provider.getSigner();
+        const TreasuryWithSigner = TreasuryContract.connect(signer);
+        //TODO: replace with treasury address
+        const transaction = await TreasuryWithSigner.getAvailableSupply();
+        console.log("Transaction: ", transaction);
+        this.setState({
+            availableSupply: ethers.utils.formatUnits(transaction, 18).toString()
+        })
+    }
+
+    async checkCirculatingSupply(e) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
+        const signer = provider.getSigner();
+        const TreasuryWithSigner = TreasuryContract.connect(signer);
+        //TODO: replace with treasury address
+        const transaction = await TreasuryWithSigner.getCirculatingSupply();
+        console.log("Transaction: ", transaction);
+        this.setState({
+            circulatingSupply: ethers.utils.formatUnits(transaction,18).toString()
+        })
     }
 
     handleSelectChange(e) {
@@ -61,11 +96,13 @@ class Admin extends React.Component {
     render() {
         return(
             <div>
-                <h1>Admin Page</h1>                
+                <h1>Control Panel</h1>                
                 <br/>
                 <Container>
-                    
-                    <Form>
+                    <Row>
+                        <Col className='contribution-border' style={{margin: "10px"}}>
+                        <Form>
+                            <h4>User Rewards</h4>
                         <Form.Group className="mb-3">
                             <Form.Label>Select Address/User</Form.Label>
                             <Form.Select
@@ -89,8 +126,29 @@ class Admin extends React.Component {
                             </Button>
                         </Form.Group>
                     </Form>
+                    <p>Undistributed Reward Balance for Selected User: {this.state.rewardBalance} TREASURE</p>
+                    </Col>
+                    <Col className='contribution-border' style={{margin: "10px"}}>
+                        <h4>Check-in on Token Supply</h4>
+                        <Form>
+                            <InputGroup className='mb-3'>
+                                <Button variant='outline-primary' onClick={this.checkCirculatingSupply}>
+                                    Check Total Circulating Supply
+                                </Button>
+                                <FormControl type="text" value={this.state.circulatingSupply}  readOnly/>
+                                <InputGroup.Text>Treasure Tokens</InputGroup.Text>
+                            </InputGroup>
+                            <InputGroup className='mb-3'>
+                                <Button variant='outline-primary' onClick={this.checkAvailableSupply}>
+                                    Check Total Available Supply
+                                </Button>
+                                <FormControl type="text" value={this.state.availableSupply} readOnly/>
+                                <InputGroup.Text>Treasure Tokens</InputGroup.Text>
+                            </InputGroup>
+                        </Form>
+                    </Col>
+                    </Row>
                     
-                    <p>Undistributed Reward Balance for Selected User: {this.state.rewardBalance} SIMP</p>
                 </Container>
             </div>
         );

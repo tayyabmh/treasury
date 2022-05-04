@@ -5,7 +5,9 @@ import {
     Accordion,
     Form,
     Button,
-    Alert
+    Alert,
+    InputGroup,
+    FormControl
 } from 'react-bootstrap';
 import {
     TreasuryAddress,
@@ -19,11 +21,14 @@ class Incentive extends React.Component {
         this.state = {
             form: {
                 review: ''
-            }
+            },
+            referralEmail: ''
         }
 
         this.handleReviewChange = this.handleReviewChange.bind(this);
         this.handleReviewSubmit = this.handleReviewSubmit.bind(this);
+        this.handleReferralChange = this.handleReferralChange.bind(this);
+        this.handleReferralSubmit = this.handleReferralSubmit.bind(this);
     }
 
     handleReviewChange(e) {
@@ -31,6 +36,28 @@ class Incentive extends React.Component {
             form: {
                 review: e.target.value
             }
+        })
+    }
+
+    handleReferralChange(e) {
+        this.setState({
+            referralEmail: e.target.value
+        })
+    }
+
+    async handleReferralSubmit(e) {
+        e.preventDefault();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
+        const signer = provider.getSigner();
+        const TreasuryWithSigner = TreasuryContract.connect(signer);
+        const txn = await TreasuryWithSigner.rewardTokens(
+            '0xdd2fd4581271e230360230f9337d5c0430bf44c0',
+            ethers.utils.parseUnits('25.0', 18)
+        );
+        console.log("TXN: ", txn);
+        this.setState({
+            referralEmail: ''
         })
     }
 
@@ -68,8 +95,8 @@ class Incentive extends React.Component {
                                     <Alert variant="dark">Reward 10 Tokens for completing a review</Alert>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Your Wallet Address:</Form.Label>
-                                    <Form.Control placeholder="0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199" disabled />
+                                    <Form.Label>You:</Form.Label>
+                                    <Form.Control placeholder="Greg Jameson <Greg.Jameson@gmail.com>" disabled />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Review For:</Form.Label>
@@ -92,6 +119,30 @@ class Incentive extends React.Component {
                                     </Button>
                                 </Form.Group>
                             </Form>
+                        </Accordion.Body>
+                    </Accordion.Item>
+                    <Accordion.Item eventKey="1">
+                        <Accordion.Header>Incentive Example #2 - Rewards for referring a friend</Accordion.Header>
+                        <Accordion.Body>
+                            <Form>
+                                <Alert variant='dark'>Reward 25 Tokens for referring a friend to the platform</Alert>
+                            </Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>You:</Form.Label>
+                                <Form.Control placeholder="Susan Patrick <Susan.Patrick@gmail.com>" disabled />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <InputGroup className='mb-3'>
+                                    <FormControl
+                                        placeholder="Enter email here"
+                                        onChange={this.handleReferralChange}
+                                        value={this.state.referralEmail}
+                                    />
+                                    <Button variant='outline-primary' id="button-addon1" onClick={this.handleReferralSubmit}>
+                                        Submit
+                                    </Button>
+                                </InputGroup>
+                            </Form.Group>
                         </Accordion.Body>
                     </Accordion.Item>
                 </Accordion>

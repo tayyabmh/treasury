@@ -45,23 +45,31 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Navbar bg="light" expand="lg">
+        <div className="top" style={{marginBottom: "100px"}}>
+        <Navbar bg="dark" variant="dark" style={{marginBottom: "10px"}} >
         <Container>
           <Navbar.Brand href="/">Kasana</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-          <Navbar.Collapse id="basic-navbar-nav"/>
+          
           <Nav className="me-auto">
             <Nav.Link href="/admin">Admin</Nav.Link>
             <Nav.Link href="/contribute">Contribute</Nav.Link>
             <Nav.Link href="/incentive">Incentivize</Nav.Link>
             <Nav.Link href="/govern">Governance</Nav.Link>
-            <Button onClick={this.handleConnectWallet}>Connect Wallet</Button>
           </Nav>
+          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+          <Navbar.Collapse id="basic-navbar-nav" className='justify-content-end'>
+            <Button onClick={this.handleConnectWallet}>Connect Wallet</Button>
+          </Navbar.Collapse>
         </Container>
         </Navbar>
+        <Container>
         <Row>
-          <Col md={8}>Wallet Address: {this.state.walletAddress} </Col>
+          <Col/>
+          <Col/>
+          <Col xs={5}><span style={{fontWeight: "bold"}}>Wallet Address:</span> {this.state.walletAddress} </Col>
         </Row>
+        </Container>
+        </div>
         <Routes>
           <Route path="/contribute" element={<Contribute />} />
           <Route path="/incentive" element={<Incentive />} />

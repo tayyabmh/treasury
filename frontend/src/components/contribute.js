@@ -5,7 +5,9 @@ import {
     Container,
     Form,
     Col,
-    Row
+    Row,
+    Tabs,
+    Tab
 } from 'react-bootstrap';
 import {
     TreasuryAddress,
@@ -30,7 +32,8 @@ class Contribute extends React.Component {
         this.handleGetTotalFunds = this.handleGetTotalFunds.bind(this);
     }
 
-    //TODO: This is probably wrong haha... but whatever
+    //TODO: This is probably unsafe haha... but whatever
+    // TODO: Something is also resulting in a Treasury.<unrecognized_selector> situation here as well... not sure what it is though.
     async handleContribute(e) {
         e.preventDefault();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -69,14 +72,18 @@ class Contribute extends React.Component {
         return (
             <div>
                 <Row>
-                    <Col md={4}>Treasury Value: {this.state.treasuryValue} ETH</Col>
-                    <Col md={{ span: 4, offset: 4 }}>
-                        
-                    </Col>
+                    <Col><h5>Treasury Value:</h5> {this.state.treasuryValue} ETH</Col>
                 </Row>
                 
                 <br/>
-                <div>
+                <div><h3>Make a Contribution to you Community Treasury</h3>
+                <br/>
+                <Row>
+                    <Col/>
+                    <Col xs={8} className="contribution-border">
+                    <Tabs defaultActiveKey="MetaMask" id="controlled-tab-example" className="mb-3">
+                    <Tab eventKey="MetaMask" title="MetaMask">
+                    <br/>
                     <Form>
                         <Container>
                             <Row>
@@ -84,7 +91,7 @@ class Contribute extends React.Component {
                                 <Col>
                                     <Form.Group className="mb-3" controlid="formContributionAmount">
                                         <Form.Label>
-                                            Contribution Amount
+                                            Contribution Amount from Wallet
                                         </Form.Label>
                                         <Form.Control 
                                             type="number" 
@@ -100,20 +107,29 @@ class Contribute extends React.Component {
                                 </Col>
                                 <Col/>
                             </Row>
+                            <br/>
                             <Row>
                                 <Col/>
-                                <Col>
-                                    <Button onClick={this.handleContribute}>
+                                <Col xs={6}>
+                                    <Button style={{margin: "0px 10px"}} onClick={this.handleContribute}>
                                         Contribute Funds
+                                    </Button>
+                                    <Button style={{margin: "0px 10px"}} onClick={this.handleGetTotalFunds}>
+                                        Check Treasury Value
                                     </Button>
                                 </Col>
                                 <Col/>
                             </Row>
                         </Container>
                     </Form>
-                    <Button onClick={this.handleGetTotalFunds}>
-                        Get Total Funds
-                    </Button>
+                    </Tab>
+                    <Tab eventKey="ACH" title="ACH Transfer (Coming Soon)" disabled/>
+                    <Tab eventKey="Stripe" title="Stripe to USDC (Polygon) Direct (Coming Soon" disabled/>
+                    <Tab eventKey="Debit" title="Debit Card (Coming Soon)" disabled/>
+                </Tabs>
+                    </Col>
+                    <Col/>
+                </Row>
                 </div>
             </div>
         );

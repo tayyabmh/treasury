@@ -31,26 +31,26 @@ contract Treasury {
     constructor () {
         owner = msg.sender;
         totalFunds = 0;
-        proposals.push(Proposal({
-            index: 0,
-            name: "Uniswap Liquidity Proposal"
-        }));
+        // proposals.push(Proposal({
+        //     index: 0,
+        //     name: "Uniswap Liquidity Proposal"
+        // }));
     }
 
     function voteForProposal(uint _index, bool _vote) public {
         require(IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender)) >0, "Only token holders can vote");
-        require(alreadyVoted[i][msg.sender] == true, "You have already voted for this proposal");
+        require(alreadyVoted[_index][msg.sender] == true, "You have already voted for this proposal");
         if(_vote) {
-            alreadyVoted[i][msg.sender] = false;
-            yesVotes[i] += IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender));
+            alreadyVoted[_index][msg.sender] = false;
+            yesVotes[_index] += IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender));
         } else if (!_vote) {
-            alreadyVoted[i][msg.sender] = false;
-            noVotes[i] += IERC20(TREASURY_TOKEN.balanceOf(address(msg.sender)));
+            alreadyVoted[_index][msg.sender] = false;
+            noVotes[_index] += IERC20(TREASURY_TOKEN).balanceOf(address(msg.sender));
         }
     }
 
     function getVoteCountsForProposals(uint _index) public returns (uint256, uint256) {
-        return (yesVotes[i], noVotes[i]);
+        return (yesVotes[_index], noVotes[_index]);
     }
 
     function setTreasuryTokenContractAddress(address _tokenContractAddress) public onlyOwner {
@@ -65,6 +65,10 @@ contract Treasury {
         rewardBalances[_user] += _amount;
     }
 
+    function getCirculatingSupply() view public returns (uint256) {
+        return (IERC20(TREASURY_TOKEN).totalSupply() - IERC20(TREASURY_TOKEN).balanceOf(address(this)));
+    }
+
     function checkRewards(address _user) view public returns (uint256) {
         return rewardBalances[_user];
     }
@@ -72,10 +76,13 @@ contract Treasury {
     function distributeRewards(address _user) public onlyOwner {
         require(IERC20(TREASURY_TOKEN).balanceOf(address(this)) > 0, "Got no more tokens bruh");
         require(rewardBalances[_user] > 0 && rewardBalances[_user] < IERC20(TREASURY_TOKEN).balanceOf(address(this)));
-        IERC20(TREASURY_TOKEN).transfer(_user, rewardBalances[_user]);
+        uint256 balance = rewardBalances[_user];
+        IERC20(TREASURY_TOKEN).transfer(_user, balance);
+        rewardBalances[_user] -= balance;
+        
     }
 
-    function getTotalRewardTokens() view public returns(uint) {
+    function getAvailableSupply() view public returns(uint256) {
         return IERC20(TREASURY_TOKEN).balanceOf(address(this));
     }
 
