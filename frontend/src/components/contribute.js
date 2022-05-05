@@ -14,7 +14,7 @@ import {
     TreasuryABI
 } from '../constants/treasury-const';
 
-
+import { getUSDWithSigner } from '../utils/ethers-helpers';
 
 class Contribute extends React.Component {
     constructor(props) {
@@ -36,13 +36,11 @@ class Contribute extends React.Component {
     // TODO: Something is also resulting in a Treasury.<unrecognized_selector> situation here as well... not sure what it is though.
     async handleContribute(e) {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        const transaction = await TreasuryWithSigner.contributeFunds({
-            value: ethers.utils.parseEther(this.state.form.contributionAmount.toString())
-        })
+        const USDWithSigner = getUSDWithSigner();
+        const transaction = await USDWithSigner.transfer(
+            TreasuryAddress,
+            ethers.utils.parseUnits(this.state.form.contributionAmount.toString(), 18)
+        )
         console.log("Transaction: ", transaction);
     }
 
@@ -50,7 +48,7 @@ class Contribute extends React.Component {
         e.preventDefault();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const totalFunds = await TreasuryContract.getTotalFunds();
+        const totalFunds = await TreasuryContract.getUSDBalance();
         console.log(ethers.utils.formatUnits(totalFunds,18));
         this.setState({
             treasuryValue: ethers.utils.formatUnits(totalFunds,18)
@@ -72,7 +70,7 @@ class Contribute extends React.Component {
         return (
             <div>
                 <Row>
-                    <Col><h5>Treasury Value:</h5> {this.state.treasuryValue} ETH</Col>
+                    <Col><h5>Treasury Value:</h5> {this.state.treasuryValue} USD</Col>
                 </Row>
                 
                 <br/>
@@ -101,7 +99,7 @@ class Contribute extends React.Component {
                                             defaultValue={this.state.form.contributionAmount}
                                         />
                                         <Form.Text className="text-muted">
-                                            You are doing a one time contribution to your Community Treasury. (Denominated in ETH)
+                                            You are doing a one time contribution to your Community Treasury. (Denominated in USD)
                                         </Form.Text>
                                     </Form.Group>
                                 </Col>

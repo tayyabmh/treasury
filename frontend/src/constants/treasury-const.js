@@ -21,6 +21,19 @@ export const TreasuryABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "USD_TOKEN",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -88,6 +101,19 @@ export const TreasuryABI = [
   {
     "inputs": [],
     "name": "getTotalFunds",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getUSDBalance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -229,6 +255,19 @@ export const TreasuryABI = [
       }
     ],
     "name": "setTreasuryTokenContractAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setUSDTokenContractAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
