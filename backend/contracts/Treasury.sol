@@ -7,6 +7,7 @@ contract Treasury {
 
 
     address public TREASURY_TOKEN;
+    address public USD_TOKEN;
 
     struct Proposal {
         uint index;
@@ -17,7 +18,8 @@ contract Treasury {
     Proposal[] public proposals;
 
     address public owner;
-    uint totalFunds;
+    uint256 totalFunds;
+    uint256 totalUSD;
     mapping (address => uint256) public rewardBalances;
     mapping (uint => uint256) public yesVotes;
     mapping (uint => uint256) public noVotes;
@@ -57,8 +59,16 @@ contract Treasury {
         TREASURY_TOKEN = _tokenContractAddress;
     }
 
+    function setUSDTokenContractAddress(address _tokenContractAddress) public onlyOwner {
+        USD_TOKEN = _tokenContractAddress;
+    }
+
     function contributeFunds() payable public onlyOwner {
         totalFunds += msg.value;      
+    }
+
+    function getUSDBalance() view public returns (uint256) {
+        return IERC20(USD_TOKEN).balanceOf(address(this));
     }
 
     function rewardTokens(address _user, uint256 _amount) public onlyOwner {
