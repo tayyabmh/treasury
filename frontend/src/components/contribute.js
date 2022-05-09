@@ -1,76 +1,59 @@
-import { ethers } from "ethers";
-import React from "react";
-import {
-    Button,
-    Container,
-    Form,
-    Col,
-    Row,
-    Tabs,
-    Tab
-} from 'react-bootstrap';
 import {
     TreasuryAddress,
     TreasuryABI
 } from '../constants/treasury-const';
+import {
+    Button,
+    Container,
+    Form,
+    Col, Row,
+    Tabs,
+    Tab
+} from 'react-bootstrap';
+import React, {useState} from 'react';
 
-import { getUSDWithSigner } from '../utils/ethers-helpers';
+import { useContractWrite, useContractRead } from 'wagmi';
+import { ethers } from 'ethers';
 
-class Contribute extends React.Component {
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            form: {
-                contributionAmount: 0
-            },
-            treasuryValue: 0
+function Contribute() {
+    const [contributionAmount, setContributionAmount] = useState(0);
+    const [treasuryValue, setTreasuryValue ] = useState(0);
+
+    const contributeFunds = useContractWrite(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI,
+        },
+        'contributeFunds',
+        {
+            overrides: {value: ethers.utils.parseEther(contributionAmount.toString())}
         }
+    )
 
-        this.handleContribute = this.handleContribute.bind(this);
-        this.handleContributionChange = this.handleContributionChange.bind(this);
-        this.handleGetTotalFunds = this.handleGetTotalFunds.bind(this);
-    }
+    const getUSDBalance = useContractRead(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'getUSDBalance'
+    )
 
-    //TODO: This is probably unsafe haha... but whatever
-    // TODO: Something is also resulting in a Treasury.<unrecognized_selector> situation here as well... not sure what it is though.
-    async handleContribute(e) {
+
+    const handleContribute = async (e) => {
         e.preventDefault();
-        const USDWithSigner = getUSDWithSigner();
-        const transaction = await USDWithSigner.transfer(
-            TreasuryAddress,
-            ethers.utils.parseUnits(this.state.form.contributionAmount.toString(), 18)
-        )
-        console.log("Transaction: ", transaction);
+        contributeFunds.write();   
     }
 
-    async handleGetTotalFunds(e) {
+    const handleGetTotalFunds = (e) => {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const totalFunds = await TreasuryContract.getUSDBalance();
-        console.log(ethers.utils.formatUnits(totalFunds,18));
-        this.setState({
-            treasuryValue: ethers.utils.formatUnits(totalFunds,18)
-        })
+        setTreasuryValue(ethers.utils.formatUnits(getUSDBalance.data,18));
     }
 
-    handleContributionChange(e) {
-        let fieldName = e.target.name;
-        let fieldVal = e.target.value;
-        console.log(e.target.value);
-        this.setState({
-            form: {
-                ...this.state.form, [fieldName]:fieldVal
-            }
-        })
-    }
-
-    render() {
-        return (
-            <div>
+    return(
+        <div>
                 <Row>
-                    <Col><h5>Treasury Value:</h5> {this.state.treasuryValue} USD</Col>
+                    <Col><h5>Treasury Value:</h5> {treasuryValue} USD</Col>
                 </Row>
                 
                 <br/>
@@ -95,8 +78,8 @@ class Contribute extends React.Component {
                                             type="number" 
                                             name="contributionAmount" 
                                             placeholder="Enter contribution amount to Treasury" 
-                                            onChange={this.handleContributionChange}
-                                            defaultValue={this.state.form.contributionAmount}
+                                            onChange={e => setContributionAmount(e.target.value)}
+                                            defaultValue={contributionAmount}
                                         />
                                         <Form.Text className="text-muted">
                                             You are doing a one time contribution to your Community Treasury. (Denominated in USD)
@@ -109,10 +92,10 @@ class Contribute extends React.Component {
                             <Row>
                                 <Col/>
                                 <Col xs={6}>
-                                    <Button style={{margin: "0px 10px"}} onClick={this.handleContribute}>
+                                    <Button style={{margin: "0px 10px"}} onClick={handleContribute}>
                                         Contribute Funds
                                     </Button>
-                                    <Button style={{margin: "0px 10px"}} onClick={this.handleGetTotalFunds}>
+                                    <Button variant="secondary" style={{margin: "0px 10px"}} onClick={handleGetTotalFunds}>
                                         Check Treasury Value
                                     </Button>
                                 </Col>
@@ -122,7 +105,7 @@ class Contribute extends React.Component {
                     </Form>
                     </Tab>
                     <Tab eventKey="ACH" title="ACH Transfer (Coming Soon)" disabled/>
-                    <Tab eventKey="Stripe" title="Stripe to USDC (Polygon) Direct (Coming Soon" disabled/>
+                    <Tab eventKey="Stripe" title="Stripe to USDC (Polygon) Direct (Coming Soon)" disabled/>
                     <Tab eventKey="Debit" title="Debit Card (Coming Soon)" disabled/>
                 </Tabs>
                     </Col>
@@ -130,8 +113,7 @@ class Contribute extends React.Component {
                 </Row>
                 </div>
             </div>
-        );
-    }
+    )
 }
 
 export default Contribute;
