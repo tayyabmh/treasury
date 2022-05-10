@@ -3,6 +3,10 @@ import {
     TreasuryABI
 } from '../constants/treasury-const';
 import {
+    USD_Address,
+    USD_ABI
+} from '../constants/usd-const';
+import {
     Button,
     Container,
     Form,
@@ -22,12 +26,13 @@ function Contribute() {
 
     const contributeFunds = useContractWrite(
         {
-            addressOrName: TreasuryAddress,
-            contractInterface: TreasuryABI,
+            addressOrName: USD_Address,
+            contractInterface: USD_ABI,
         },
-        'contributeFunds',
+        'transfer',
         {
-            overrides: {value: ethers.utils.parseEther(contributionAmount.toString())}
+            // Breaks when contribution Amount is erased
+            args: [TreasuryAddress, ethers.utils.parseUnits(contributionAmount.toString(),18)]
         }
     )
 
@@ -78,7 +83,13 @@ function Contribute() {
                                             type="number" 
                                             name="contributionAmount" 
                                             placeholder="Enter contribution amount to Treasury" 
-                                            onChange={e => setContributionAmount(e.target.value)}
+                                            onChange={e => {
+                                                if (e.target.value === '') {
+                                                    e.target.value = 0;
+                                                }
+                                                setContributionAmount(e.target.value)
+                                                }
+                                            }
                                             defaultValue={contributionAmount}
                                         />
                                         <Form.Text className="text-muted">

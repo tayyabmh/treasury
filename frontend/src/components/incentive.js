@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Container,
     Accordion,
@@ -13,73 +13,44 @@ import {
     TreasuryAddress,
     TreasuryABI
 } from '../constants/treasury-const';
-
-class Incentive extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            form: {
-                review: ''
-            },
-            referralEmail: ''
+import { useContractWrite } from 'wagmi';
+function Incentive() {
+    const [review, setReview ] = useState('');
+    const [referralEmail, setReferralEmail ] = useState('');
+    
+    const referralIncentive = useContractWrite(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'rewardTokens',
+        {
+            args: ['0xdd2fd4581271e230360230f9337d5c0430bf44c0', ethers.utils.parseUnits('25.0', 18)]
         }
+    )
 
-        this.handleReviewChange = this.handleReviewChange.bind(this);
-        this.handleReviewSubmit = this.handleReviewSubmit.bind(this);
-        this.handleReferralChange = this.handleReferralChange.bind(this);
-        this.handleReferralSubmit = this.handleReferralSubmit.bind(this);
-    }
+    const reviewIncentive = useContractWrite(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'rewardTokens',
+        {
+            args: ['0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199', ethers.utils.parseUnits('10.0', 18)]
+        }
+    )
 
-    handleReviewChange(e) {
-        this.setState({
-            form: {
-                review: e.target.value
-            }
-        })
-    }
-
-    handleReferralChange(e) {
-        this.setState({
-            referralEmail: e.target.value
-        })
-    }
-
-    async handleReferralSubmit(e) {
+    const handleReviewSubmit = async(e) => {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        const txn = await TreasuryWithSigner.rewardTokens(
-            '0xdd2fd4581271e230360230f9337d5c0430bf44c0',
-            ethers.utils.parseUnits('25.0', 18)
-        );
-        console.log("TXN: ", txn);
-        this.setState({
-            referralEmail: ''
-        })
+        reviewIncentive.write()
     }
 
-    async handleReviewSubmit(e) {
+    const handleReferralSubmit = async(e) => {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        const transaction = await TreasuryWithSigner.rewardTokens(
-            '0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199',
-            ethers.utils.parseUnits('10.0', 18)
-        );
-        console.log("Transaction: ", transaction);
-        this.setState({
-            form: {
-                review: ''
-            }
-        })
+        referralIncentive.write();
     }
 
-    render() {
+
         return (
             <div>
                 <h1>
@@ -91,7 +62,7 @@ class Incentive extends React.Component {
                         <Accordion.Header>Incentive Example #1 - Rewards for completing reviews</Accordion.Header>
                         <Accordion.Body>
                             <Form>
-                                <Form.Group classname="mb-3">
+                                <Form.Group className="mb-3">
                                     <Alert variant="dark">Reward 10 Tokens for completing a review</Alert>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
@@ -110,11 +81,11 @@ class Incentive extends React.Component {
                                     <Form.Label>Write your Review</Form.Label>
                                     <Form.Control 
                                     as="textarea"
-                                    onChange={this.handleReviewChange}
-                                    value={this.state.form.review}/>
+                                    onChange={e => setReview(e.target.value)}
+                                    value={review}/>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Button onClick={this.handleReviewSubmit}>
+                                    <Button onClick={handleReviewSubmit}>
                                         Submit Review
                                     </Button>
                                 </Form.Group>
@@ -135,10 +106,10 @@ class Incentive extends React.Component {
                                 <InputGroup className='mb-3'>
                                     <FormControl
                                         placeholder="Enter email here"
-                                        onChange={this.handleReferralChange}
-                                        value={this.state.referralEmail}
+                                        onChange={e => setReferralEmail(e.target.value)}
+                                        value={referralEmail}
                                     />
-                                    <Button variant='outline-primary' id="button-addon1" onClick={this.handleReferralSubmit}>
+                                    <Button variant='outline-primary' id="button-addon1" onClick={handleReferralSubmit}>
                                         Submit
                                     </Button>
                                 </InputGroup>
@@ -150,7 +121,7 @@ class Incentive extends React.Component {
             </div>
         )
     }
-}
+
 
 export default Incentive;
 

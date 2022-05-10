@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Container,
     Form,
@@ -13,87 +13,73 @@ import {
     TreasuryAddress,
     TreasuryABI
 } from '../constants/treasury-const';
+import { useContractRead, useContractWrite } from 'wagmi';
 
-class Admin extends React.Component {
-    constructor(props) {
-        super(props);
+function Admin() {
+    const [addressSelect, setAddressSelect] = useState('');
+    const [rewardBalance, setRewardBalance] = useState(0);
+    const [ circulatingSupply, setCirculatingSupply] = useState(0);
+    const [ availableSupply, setAvailableSupply ] = useState(0);
 
-        this.state = {
-            addressSelect: '',
-            rewardBalance: 0,
-            circulatingSupply: 0,
-            availableSupply: 0
+    const getAvailableSupply = useContractRead(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'getAvailableSupply'
+    )
+
+    const getCirculatingSupply = useContractRead(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'getCirculatingSupply'
+    )
+
+    const getUserRewardsBalance = useContractRead(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'checkRewards',
+        {
+            args: addressSelect
         }
-        
-        this.handleSelectChange = this.handleSelectChange.bind(this);
-        this.handleCheckRewardsBalance = this.handleCheckRewardsBalance.bind(this);
-        this.handleDistributeRewards = this.handleDistributeRewards.bind(this);
-        this.checkAvailableSupply = this.checkAvailableSupply.bind(this);
-        this.checkCirculatingSupply = this.checkCirculatingSupply.bind(this);
-    }
+    )
+
+    const distributeRewards = useContractWrite(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        'distributeRewards',
+        {
+            args: addressSelect
+        }
+    )
 
 
-    async checkAvailableSupply(e) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        //TODO: replace with treasury address
-        const transaction = await TreasuryWithSigner.getAvailableSupply();
-        console.log("Transaction: ", transaction);
-        this.setState({
-            availableSupply: ethers.utils.formatUnits(transaction, 18).toString()
-        })
-    }
-
-    async checkCirculatingSupply(e) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        //TODO: replace with treasury address
-        const transaction = await TreasuryWithSigner.getCirculatingSupply();
-        console.log("Transaction: ", transaction);
-        this.setState({
-            circulatingSupply: ethers.utils.formatUnits(transaction,18).toString()
-        })
-    }
-
-    handleSelectChange(e) {
+    const handleCheckAvailableSupply = async (e) => {
         e.preventDefault();
-        console.log(e.target.value);
-        this.setState({
-            addressSelect: e.target.value
-        })
+        setAvailableSupply(ethers.utils.formatUnits(getAvailableSupply.data, 18));
     }
 
-    async handleCheckRewardsBalance(e) {
+    const handleCheckCirculatingSupply = async (e) => {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        const transaction = await TreasuryWithSigner.checkRewards(this.state.addressSelect);
-        console.log("Transaction: ", transaction);
-        this.setState({
-            rewardBalance: ethers.utils.formatUnits(transaction, 18)
-        })
+        setCirculatingSupply(ethers.utils.formatUnits(getCirculatingSupply.data,18));
     }
 
-    async handleDistributeRewards(e) {
+    const handleCheckRewards = async (e) => {
         e.preventDefault();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const TreasuryContract = new ethers.Contract(TreasuryAddress, TreasuryABI, provider);
-        const signer = provider.getSigner();
-        const TreasuryWithSigner = TreasuryContract.connect(signer);
-        const transaction = await TreasuryWithSigner.distributeRewards(this.state.addressSelect);
-        console.log("TXN: ", transaction);
-        this.setState({
-            rewardBalance: 0
-        });
+        setRewardBalance(ethers.utils.formatUnits(getUserRewardsBalance.data, 18));
     }
 
-    render() {
+    const handleDistributeRewards = async(e) => {
+        e.preventDefault();
+        distributeRewards.write();
+        setRewardBalance(0);
+    }
         return(
             <div>
                 <h1>Control Panel</h1>                
@@ -106,8 +92,8 @@ class Admin extends React.Component {
                         <Form.Group className="mb-3">
                             <Form.Label>Select Address/User</Form.Label>
                             <Form.Select
-                                onChange={this.handleSelectChange}
-                                value={this.state.addressSelect}
+                                onChange={e => setAddressSelect(e.target.value)}
+                                value={addressSelect}
                             >
                                 <option value=''></option>
                                 <option value="0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199">Greg Jameson &lt;greg.jameson@gmail.com&gt;</option>
@@ -116,33 +102,33 @@ class Admin extends React.Component {
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className='mb-3'>
-                            <Button onClick={this.handleCheckRewardsBalance}>
+                            <Button onClick={handleCheckRewards}>
                                 Check Reward Balance
                             </Button>
                         </Form.Group>
                         <Form.Group className='mb-3'>
-                            <Button onClick={this.handleDistributeRewards}>
+                            <Button onClick={handleDistributeRewards}>
                                 Distribute Rewards
                             </Button>
                         </Form.Group>
                     </Form>
-                    <p>Undistributed Reward Balance for Selected User: {this.state.rewardBalance} TREASURE</p>
+                    <p>Undistributed Reward Balance for Selected User: {rewardBalance} TREASURE</p>
                     </Col>
                     <Col className='contribution-border' style={{margin: "10px"}}>
                         <h4>Check-in on Token Supply</h4>
                         <Form>
                             <InputGroup className='mb-3'>
-                                <Button variant='outline-primary' onClick={this.checkCirculatingSupply}>
+                                <Button variant='outline-primary' onClick={handleCheckCirculatingSupply}>
                                     Check Total Circulating Supply
                                 </Button>
-                                <FormControl type="text" value={this.state.circulatingSupply}  readOnly/>
+                                <FormControl type="text" value={circulatingSupply}  readOnly/>
                                 <InputGroup.Text>Treasure Tokens</InputGroup.Text>
                             </InputGroup>
                             <InputGroup className='mb-3'>
-                                <Button variant='outline-primary' onClick={this.checkAvailableSupply}>
+                                <Button variant='outline-primary' onClick={handleCheckAvailableSupply}>
                                     Check Total Available Supply
                                 </Button>
-                                <FormControl type="text" value={this.state.availableSupply} readOnly/>
+                                <FormControl type="text" value={availableSupply} readOnly/>
                                 <InputGroup.Text>Treasure Tokens</InputGroup.Text>
                             </InputGroup>
                         </Form>
@@ -153,7 +139,7 @@ class Admin extends React.Component {
             </div>
         );
     }
-}
+
 
 
 export default Admin;

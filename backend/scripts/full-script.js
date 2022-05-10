@@ -16,6 +16,7 @@ async function main() {
     await usd.deployed();
 
     console.log("USD deployed to: ", usd.address);
+    await treasury.setUSDTokenContractAddress(usd.address);
 
     const Token = await ethers.getContractFactory("KToken");
     const token = await Token.deploy(treasury.address, 1000000000000000);
@@ -23,6 +24,7 @@ async function main() {
     await token.deployed();
     
     console.log("Treasure Token deployed to: ", token.address);
+    await treasury.setTreasuryTokenContractAddress(token.address);
 }
 
 main()
