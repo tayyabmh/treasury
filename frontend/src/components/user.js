@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Container,
     Row, Col,
@@ -9,31 +9,37 @@ import {
     FormControl,
     Table
 } from 'react-bootstrap';
-import { getTreasuryWithSigner } from '../utils/ethers-helpers';
+import { TreasuryABI,TreasuryAddress } from '../constants/treasury-const';
 
-class User extends React.Component {
-    constructor(props) {
-        super(props);
+import { useContractRead, useAccount } from 'wagmi';
 
-        this.state = {
-            ClaimableRewards: 0
+function User(){
+    const [claimableRewards, setClaimableRewards] = useState(0);
+    const [accountAddress, setAccountAddress] = useState('');
+    const accountInfo = useAccount({
+        onSuccess(data) {
+            setAccountAddress(data.address);
         }
+    });
 
-        this.checkClaimableRewards = this.checkClaimableRewards.bind(this);
-    }
+    const checkClaimableRewards = useContractRead(
+        {
+            addressOrName: TreasuryAddress,
+            contractInterface: TreasuryABI
+        },
+        {
+            args: accountAddress
+        },
+        'checkRewards'
+    )
 
-    async checkClaimableRewards(e) {
+    const handleCheckClaimableRewards = async (e) => {
         e.preventDefault();
-        const TreasuryWithSigner = getTreasuryWithSigner();
-        const txn = await TreasuryWithSigner.checkRewards('0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199');
-        console.log(txn);
-        this.setState({
-            ClaimableRewards: ethers.utils.formatUnits(txn, 18)
-        })
+        const { data } = await checkClaimableRewards.refetch();
+        setClaimableRewards(ethers.utils.parseUnits(data,18));
     }
 
 
-    render() {
         return (
             <div>
                 <h1>User Dashboard</h1>
@@ -45,10 +51,10 @@ class User extends React.Component {
                             </h4>
                             <Form>
                                 <InputGroup className='mb-3'>
-                                    <Button variant='outline-primary' onClick={this.checkClaimableRewards}>
+                                    <Button variant='outline-primary' onClick={handleCheckClaimableRewards}>
                                         Check Claimable Rewards
                                     </Button>
-                                    <FormControl type="text" value={this.state.ClaimableRewards} readOnly />
+                                    <FormControl type="text" value={claimableRewards} readOnly />
                                     <InputGroup.Text>Treasure Tokens</InputGroup.Text>
                                 </InputGroup>
                             </Form>
@@ -98,6 +104,6 @@ class User extends React.Component {
             </div>
         );
     }
-}
+
 
 export default User;

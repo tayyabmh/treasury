@@ -62,17 +62,20 @@ function Admin() {
 
     const handleCheckAvailableSupply = async (e) => {
         e.preventDefault();
-        setAvailableSupply(ethers.utils.formatUnits(getAvailableSupply.data, 18));
+        const {data} = await getAvailableSupply.refetch();
+        setAvailableSupply(ethers.utils.formatUnits(data, 18));
     }
 
     const handleCheckCirculatingSupply = async (e) => {
         e.preventDefault();
-        setCirculatingSupply(ethers.utils.formatUnits(getCirculatingSupply.data,18));
+        const { data } = await getCirculatingSupply.refetch();
+        setCirculatingSupply(ethers.utils.formatUnits(data,18));
     }
 
     const handleCheckRewards = async (e) => {
         e.preventDefault();
-        setRewardBalance(ethers.utils.formatUnits(getUserRewardsBalance.data, 18));
+        const { data } = await getUserRewardsBalance.refetch();
+        setRewardBalance(ethers.utils.formatUnits(data, 18));
     }
 
     const handleDistributeRewards = async(e) => {

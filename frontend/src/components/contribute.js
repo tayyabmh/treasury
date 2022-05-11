@@ -50,9 +50,10 @@ function Contribute() {
         contributeFunds.write();   
     }
 
-    const handleGetTotalFunds = (e) => {
+    const handleGetTotalFunds = async (e) => {
         e.preventDefault();
-        setTreasuryValue(ethers.utils.formatUnits(getUSDBalance.data,18));
+        const {data} = await getUSDBalance.refetch();
+        setTreasuryValue(ethers.utils.formatUnits(data,18));
     }
 
     return(
