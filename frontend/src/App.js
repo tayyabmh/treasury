@@ -25,6 +25,8 @@ import Admin from './components/admin';
 // import Governance from './components/govern';
 import User from './components/user';
 import Setup from './components/setup';
+import Dashboard from './components/dashboard';
+import Liquidity from './components/liquidity_pool';
 
 const { chains, provider } = configureChains(
   [chain.hardhat],
@@ -53,11 +55,13 @@ class App extends React.Component {
           <div className="App">
             <NavigationSidebar/>
             <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/contribute" element={<Contribute />} />
               <Route path="/incentive" element={<Incentive />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/user" element ={<User/>} />
               <Route path="/setup" element={<Setup />}/>
+              <Route path="/liquidity" element={<Liquidity />} />
               {/* <Route path="/govern" element={<Governance />} /> */}
             </Routes>
           </div>

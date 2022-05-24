@@ -18,7 +18,7 @@ function NavigationSidebar() {
                     <Nav.Link href="/incentive">Incentivize</Nav.Link>
                     <Nav.Link href="/user">User Page</Nav.Link>
                     <Nav.Link href="/setup">Setup</Nav.Link>
-
+                    <Nav.Link href="/dashboard">Dashboard</Nav.Link>
                     {/* <Nav.Link href="/govern">Governance</Nav.Link> */}
               </Nav>
               <Navbar.Toggle aria-controls="basic-navbar-nav"/>
