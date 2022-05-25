@@ -19,14 +19,10 @@ import { Routes, Route } from 'react-router-dom';
 
 //Local file imports
 import NavigationSidebar from './components/nav';
-import Contribute from './components/contribute';
-import Incentive from './components/incentive';
-import Admin from './components/admin';
-// import Governance from './components/govern';
-import User from './components/user';
 import Setup from './components/setup';
 import Dashboard from './components/dashboard';
-import Liquidity from './components/liquidity_pool';
+import Liquidity from './components/liquidity_setup';
+import LiquidityInitialization from './components/liquiduity_initialize';
 
 const { chains, provider } = configureChains(
   [chain.hardhat],
@@ -56,12 +52,9 @@ class App extends React.Component {
             <NavigationSidebar/>
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/contribute" element={<Contribute />} />
-              <Route path="/incentive" element={<Incentive />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/user" element ={<User/>} />
               <Route path="/setup" element={<Setup />}/>
-              <Route path="/liquidity" element={<Liquidity />} />
+              <Route path="/liquidity_setup" element={<Liquidity />} />
+              <Route path='/liquidity_init' element={<LiquidityInitialization/>}/>
               {/* <Route path="/govern" element={<Governance />} /> */}
             </Routes>
           </div>

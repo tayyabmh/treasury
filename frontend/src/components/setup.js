@@ -4,12 +4,14 @@ import {
     Form,
     Button
 } from 'react-bootstrap';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const client = axios.create({
-    baseURL: 'http://localhost:8000'
-})
+
+
+
 function Setup() {
+    const navigate = useNavigate();
+
     const [tokenName, setTokenName ] = useState('');
     const [tokenTicker, setTokenTicker ] = useState('');
 
@@ -19,14 +21,9 @@ function Setup() {
     }
 
     const sendTokenInfo = (tokenName, tokenTicker) => {
-        client.post('/setup', {
-            tokenName: tokenName,
-            tokenTicker: tokenTicker
-        }).then((response) => {
-            console.log(response);
-        }).catch((error) => {
-            console.error(error);
-        })
+        localStorage.setItem("tokenName", tokenName);
+        localStorage.setItem("tokenTicker", tokenTicker);
+        navigate('/liquidity_setup');
     }
 
     return(

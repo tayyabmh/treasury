@@ -9,7 +9,7 @@ import {
     ProgressBar,
     Form
 } from 'react-bootstrap';
-import {getTreasuryWithSigner} from '../utils/ethers-helpers';
+import {getTreasuryWithSigner} from '../../utils/ethers-helpers';
 
 class Governance extends React.Component {
     constructor(props) {

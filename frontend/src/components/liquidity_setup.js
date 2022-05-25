@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
     Container, Row, Col,
@@ -7,9 +6,6 @@ import {
     Button
 } from 'react-bootstrap';
 
-const client = axios.create({
-    baseURL: 'http://localhost:8000'
-})
 
 function Liquidity() {
     const [tokenQuantity, setTokenQuantity] = useState(0);
@@ -17,20 +13,18 @@ function Liquidity() {
     const [requiredBacking, setRequiredBacking ] = useState(0);
 
     useEffect(() => {
-        setRequiredBacking(tokenQuantity * tokenBasePrice)
+        if(tokenQuantity * tokenBasePrice === 0 || isNaN(tokenQuantity * tokenBasePrice)) {
+            setRequiredBacking(0);
+        } else {
+            setRequiredBacking(tokenQuantity * tokenBasePrice)
+        }
     }, [tokenQuantity, tokenBasePrice])
 
     const handleLiquiditySet = (e) => {
         e.preventDefault();
-        client.post('/liquidity', {
-            tokenQuantity,
-            tokenBasePrice,
-            requiredBacking
-        }).then((response) => {
-            console.log(response);
-        }).catch((error) => {
-            console.error(error);
-        })
+        localStorage.setItem("tokenQuantity", tokenQuantity);
+        localStorage.setItem("tokenBasePrice", tokenBasePrice);
+        localStorage.setItem("requiredBacking", requiredBacking);        
     }
 
     return(
@@ -70,6 +64,7 @@ function Liquidity() {
                                         placeholder="0"
                                         value={requiredBacking}
                                         type="decimal"
+                                        readOnly
                                     />
                                 </InputGroup>
                             </Form.Group>
