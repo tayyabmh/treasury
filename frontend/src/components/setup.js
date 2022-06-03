@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Container, Row, Col,
     Form,
-    Button
+    Button,
+    Spinner
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,10 +15,22 @@ function Setup() {
 
     const [tokenName, setTokenName ] = useState('');
     const [tokenTicker, setTokenTicker ] = useState('');
+    const [deploying, setDeploying ] = useState(false);
+
+    useEffect(() => {
+        if(tokenTicker === '') {
+            setTokenTicker('$');
+        }
+    }, [tokenTicker])
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        sendTokenInfo(tokenName, tokenTicker);
+        setDeploying(true);
+        setTimeout(function() {
+            setDeploying(false);
+            sendTokenInfo(tokenName, tokenTicker);
+
+        }, 3000);
     }
 
     const sendTokenInfo = (tokenName, tokenTicker) => {
@@ -27,8 +40,9 @@ function Setup() {
     }
 
     return(
-        <div>
-            <h1>Setup</h1>
+        <div style={{textAlign: 'left'}}>
+            <Row style={{margin: "20px 105px"}}><h1>Token Setup</h1></Row>
+
             <Container>
                 <Row>
                     <Col>
@@ -49,8 +63,8 @@ function Setup() {
                                     value={tokenTicker}
                                 />
                             </Form.Group>
-                            <Button onClick={handleSubmit}>
-                                Deploy
+                            <Button style={{minWidth: "150px"}} onClick={handleSubmit} disabled={deploying}>
+                                {!deploying? <span>Next</span> : <div><Spinner animation="border" size="sm" role="status"/><span> Loading...</span></div>}
                             </Button>
                         </Form>
                     </Col>

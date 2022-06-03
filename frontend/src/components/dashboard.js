@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, {  useState} from 'react';
 import {
     Container, Row, Col,
     InputGroup,
@@ -22,9 +22,10 @@ function Dashboard() {
     const [tokensToBuy, setTokensToBuy] = useState(0);
     const [MarketplaceTokens, setMarketplaceTokens] = useState(1_000_000);
     const [USDToken, setUSDToken ] = useState(100_000);
-    const [ tokenPrice, setTokenPrice] = useState(0.1);
+    const [ tokenPrice, setTokenPrice] = useState(USDToken/ MarketplaceTokens);
 
-    const K = MarketplaceTokens * USDToken;
+    // TODO: SET IT FOR NOW, fix this later
+    const K = 100000000000;
 
     const handleFundsAddition = (e) => {
         e.preventDefault();
@@ -38,29 +39,45 @@ function Dashboard() {
 
     const handleBuynBurn = (e) => {
         e.preventDefault();
-        setUSDToken(USDToken => USDToken + tokensToBuy);
-        setMarketplaceTokens(MarketplaceTokens => K/MarketplaceTokens);
+        setUSDToken(USDToken => USDToken + parseInt(tokensToBuy));
+        console.log("K: ", K);
+        console.log("USD: ", USDToken)
+        let newMarketplaceTokenQuantity = K / USDToken;
+        console.log("MPT Quanty: ", newMarketplaceTokenQuantity);
+        setMarketplaceTokens(newMarketplaceTokenQuantity);
         // So what's the new price of the Marketplace Token
         //TODO: underrstand this price change
+        setTokenPrice(USDToken / MarketplaceTokens);
+        setData(data => [...data, {
+            name: dataIndex + 1,
+            funds: data[dataIndex].funds - parseInt(tokensToBuy),
+            tokenPrice: tokenPrice
+        }])
+        console.log("USD: $",USDToken);
+        console.log("MARKETPLACE TOKENS: ", MarketplaceTokens);
+        console.log("TOKEN PRICE: $", tokenPrice);
+        setDataIndex(dataIndex => dataIndex + 1);
     }
 
     return(
         <div>
-            <h1>Dashboard</h1>
+            <div style={{textAlign: 'left', marginLeft: "100px"}}>
+                <h1>Dashboard</h1>
+            </div>
             <Container>
                 <Row>
-                    <Col>
+                    <Col md={6}>
                     <h4>Treasury Funds</h4>
                     <FundsChart data={data}/>
                         
                     </Col>
-                    <Col>
+                    <Col md={6}>
                     <h4>Token Price</h4>
                     <TokenPrice data={data}/>
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
+                    <Col md={6}>
                         Treasury Actions
                         <Form>
                             <InputGroup className='mb-3'>
@@ -76,7 +93,7 @@ function Dashboard() {
                             </InputGroup>
                         </Form>
                     </Col>
-                    <Col>
+                    <Col md={6}>
                         Token Actions
                         <Form>
                             <InputGroup className='mb-3'>

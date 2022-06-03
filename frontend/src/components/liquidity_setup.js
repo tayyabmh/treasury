@@ -3,14 +3,19 @@ import {
     Container, Row, Col,
     Form,
     InputGroup, 
-    Button
+    Button,
+    Spinner
 } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 
 function Liquidity() {
+    const navigate = useNavigate();
+
     const [tokenQuantity, setTokenQuantity] = useState(0);
     const [tokenBasePrice, setTokenBasePrice ] = useState(0);
     const [requiredBacking, setRequiredBacking ] = useState(0);
+    const [ deploying, setDeploying ] = useState(false);
 
     useEffect(() => {
         if(tokenQuantity * tokenBasePrice === 0 || isNaN(tokenQuantity * tokenBasePrice)) {
@@ -22,18 +27,25 @@ function Liquidity() {
 
     const handleLiquiditySet = (e) => {
         e.preventDefault();
-        localStorage.setItem("tokenQuantity", tokenQuantity);
-        localStorage.setItem("tokenBasePrice", tokenBasePrice);
-        localStorage.setItem("requiredBacking", requiredBacking);        
+        setDeploying(true);
+        setTimeout(function() {
+            setDeploying(false);
+            localStorage.setItem("tokenQuantity", tokenQuantity);
+            localStorage.setItem("tokenBasePrice", tokenBasePrice);
+            localStorage.setItem("requiredBacking", requiredBacking);
+            navigate('/manage_token');
+        }, 3000);
+        
     }
 
     return(
-        <div>
-            <h1>Liquidity Management</h1>
+        <div style={{textAlign: 'left'}}>
+            <Row style={{margin: "20px 105px"}}>
+            <h1>Initial Token Pricing</h1>
+            </Row>
             <Container>
                 <Row>
                     <Col>
-                        <h3>add to pool</h3>
                         <Form>
                             <Form.Group className='mb-3' controlId="tokenQuantity">
                                 <Form.Label>Number of Tokens in Liquidity Pool</Form.Label>
@@ -57,7 +69,7 @@ function Liquidity() {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group className='mb-3' controlId='requiredBacking'>
-                                <Form.Label>Required backing (Base Price X Number of Tokens)</Form.Label>
+                                <Form.Label>Required backing (Base Price * Number of Tokens)</Form.Label>
                                 <InputGroup>
                                     <InputGroup.Text>$</InputGroup.Text>
                                     <Form.Control
@@ -69,18 +81,29 @@ function Liquidity() {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group>
-                                <Button onClick={handleLiquiditySet}>
-                                    Set
+                                <Button onClick={handleLiquiditySet} style={{minWidth: "150px"}} disabled={deploying}>
+                                    {!deploying ? <span>Set</span> : <div><Spinner animation="border" size="sm" role="status"/><span> Loading...</span></div>}
                                 </Button>
                             </Form.Group>
                         </Form>
                     </Col>
                     <Col>
-                        <h3>Information</h3>
+                        <h3>Pricing & Liquidity</h3>
+                        <a href="/">Link to docs explaining how this works</a>
+                        <img src='liquidity_explainer.jpeg' alt="uniswap liquidity explainer"width={576}/>
+                        <p>
+                            Your tokens price is determined by the current market rate, which is determined by it's relative value to an asset like the US Dollar.
+                        </p>
+                        <p>
+                            Your coin can be listed permissionlessly on a decentralized exchange like Uniswap. But, someone must provide the liquidity for this. In almost all cases, this is done by the team behind the token project. But, other people can also contribute to the liquidity pool.
+                        </p>
+                        
                         <p>
                             We recommend adding in 10% of total tokens into a liquidity pool, along with a beginning base price for the token. For example, 1,000,000 tokens backed with $10,000 for a base price of $0.10 / token.
                         </p>
-                        <p>Don't worry about actually doing this just yet, we are simply getting set up.</p>
+                        <p>
+                            This is just an example, the specifics for your token can be different.
+                        </p>
                     </Col>
                 </Row>
             </Container>
