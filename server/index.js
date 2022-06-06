@@ -1,9 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const hre = require('hardhat');
-const ethers = hre.ethers;
-
+const ethers = require('ethers');
 
 const app = express();
 const port = 8000;
@@ -12,6 +10,15 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+// CONSTANTS - this will change in future editions
+let maxSupply = 1_000_000_000;
+let circulatingSupply = 0;
+let LP_marketplace_token = 100_000;
+let LP_USD_token = 10_000;
+let tokenPrice = LP_USD_token / LP_marketplace_token;
+const K = LP_marketplace_token * LP_USD_token;
+
+// Config Objects
 let token_info = {
     tokenName: '',
     tokenTicker: ''
@@ -23,15 +30,7 @@ let liquidity_settings = {
     dollarCollateral: 0
 }
 
-
-
-let maxSupply = 1_000_000_000;
-let circulatingSupply = 0;
-let LP_marketplace_token = 100_000;
-let LP_USD_token = 10_000;
-let tokenPrice = LP_USD_token / LP_marketplace_token;
-const K = LP_marketplace_token * LP_USD_token;
-
+// Initial lists to manage Wallets, Transactions History, Token Distribution Data, and Price history
 let userWallets = [
     {
         id: 1,
@@ -42,17 +41,12 @@ let userWallets = [
     }
 ]
 
-let UWindex = 2;
-
 let priceData = [
     {
         index: 0,
         tokenPrice: 0.1
     }
 ]
-let PDIndex = 1;
-
-let transactions_log = [];
 
 let TokenDistributionData = [
     {
@@ -62,49 +56,48 @@ let TokenDistributionData = [
     }
 ]
 
-let TDindex = 1;
+let transactions_log = [];
+
+// Needed indices to manage ongoing lists
+let UWindex = 2; // User Wallet Index
+let PDIndex = 1; // Price Date Index
+let TDindex = 1; // Token Distribution Index
 
 function logTransaction(transactions_log, recentTransaction) {
     return transactions_log.push(recentTransaction);
 }
 
-
+// BASE ENDPOINTS
 app.get('/', (req,res) => {
     res.send('Hello');
 });
 
+app.post('/setup', (req, res) => {
+    const token = req.body;
+    token_info.tokenName = token.tokenName;
+    token_info.tokenTicker = token.tokenTicker;
+    console.log(token_info);
+})
+
+app.post('/liquidity', (req,res) => {
+    const liquidity = req.body;
+    liquidity_settings.tokenQuantity = liquidity.tokenQuantity;
+    liquidity_settings.tokenBasePrice = liquidity.tokenBasePrice;
+    liquidity_settings.dollarCollateral = liquidity.requiredBacking;
+    console.log(liquidity_settings);
+})
+
+app.get('/token_info', (req,res) => {
+    res.send(token_info)
+})
+
+app.get('/liquidity_info', (req,res) => {
+    res.send(liquidity_settings);
+})
+
+// TOKEN ENDPOINTS
 app.get('/token/transactions', (req,res) => {
     res.status(200).send(transactions_log);
-})
-
-// This doesn't actually deploy to the Liquidity Pool
-app.get('/deploy', async (req, res) => {
-    const USD = await ethers.getContractFactory("USDC");
-    const usd = await USD.deploy('0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266', 1000000);
-
-    await usd.deployed();
-
-    console.log("Treasury deployed to: ", usd.address);
-
-    res.send("Done.")
-});
-
-app.post('/wallets/create', (req, res) => {
-    const wallet = req.body;
-    let temp_wallet_obj = {
-        id: UWindex++,
-        name: wallet.name,
-        email: wallet.email,
-        walletAddress: ethers.Wallet.createRandom().address,
-        tokenHoldings: 0
-    }
-    userWallets.push(temp_wallet_obj);
-    
-    res.status(200).send(temp_wallet_obj);
-})
-
-app.get('/wallets/list', (req, res) => {
-    res.status(200).send(userWallets);
 })
 
 app.get('/token/pricedata', (req,res) => {
@@ -113,13 +106,6 @@ app.get('/token/pricedata', (req,res) => {
 
 app.get('/token/distributionData', (req,res) => {
     res.status(200).send(TokenDistributionData);
-})
-
-// TODO: Error handling when id is out of array
-app.get('/wallets/list/:id', (req, res) => {
-    const walletId = req.params.id;
-    const temp_wallet_obj = userWallets.find(wallet => wallet.id.toString() === walletId);
-    res.status(200).send(temp_wallet_obj);
 })
 
 app.post('/token/distribute/:id', (req, res) => {
@@ -162,10 +148,6 @@ app.post('/token/sell/:id', (req,res) => {
         LP_USD_token = K / LP_marketplace_token;
         let userPayout = prevUSDAmount - LP_USD_token;
         tokenPrice = LP_USD_token/LP_marketplace_token;
-        console.log(LP_marketplace_token);
-        console.log(LP_USD_token);
-        console.log(tokenPrice);
-        console.log(userPayout);
 
         let newPriceData = {
             index: PDIndex,
@@ -192,27 +174,64 @@ app.get('/token/circulating_supply', (req,res) => {
     })
 })
 
-app.post('/setup', (req, res) => {
-    const token = req.body;
-    token_info.tokenName = token.tokenName;
-    token_info.tokenTicker = token.tokenTicker;
-    console.log(token_info);
+app.post('/token/purchase', (req, res) => {
+    const purchaseAmount = req.body.purchaseAmount;
+    LP_USD_token += purchaseAmount;
+    let prevTokenAmount = LP_marketplace_token;
+    LP_marketplace_token = K / LP_USD_token;
+    let tokenPurchaseQuantity = prevTokenAmount - LP_marketplace_token;
+    tokenPrice = LP_USD_token/LP_marketplace_token;
+
+    let newPriceData = {
+        index: PDIndex,
+        tokenPrice: tokenPrice
+    }
+    PDIndex++;
+    priceData.push(newPriceData);
+
+    let recentTransaction = {
+        "to": "0x000000000000000000000000000000000000dEaD",
+        "type": "BUY N BURN",
+        "amount": tokenPurchaseQuantity,
+        "time": Date.now()
+    }
+
+    logTransaction(transactions_log, recentTransaction);
+
+    res.status(200).send("Bought n burned!");
+
 })
 
-app.post('/liquidity', (req,res) => {
-    const liquidity = req.body;
-    liquidity_settings.tokenQuantity = liquidity.tokenQuantity;
-    liquidity_settings.tokenBasePrice = liquidity.tokenBasePrice;
-    liquidity_settings.dollarCollateral = liquidity.requiredBacking;
-    console.log(liquidity_settings);
+
+// WALLET ENDPOINTS
+app.post('/wallets/create', (req, res) => {
+    const wallet = req.body;
+    let temp_wallet_obj = {
+        id: UWindex++,
+        name: wallet.name,
+        email: wallet.email,
+        walletAddress: ethers.Wallet.createRandom().address,
+        tokenHoldings: 0
+    }
+    userWallets.push(temp_wallet_obj);
+    
+    res.status(200).send(temp_wallet_obj);
 })
 
-app.get('/token_info', (req,res) => {
-    res.send(token_info)
+app.get('/wallets/list', (req, res) => {
+    res.status(200).send(userWallets);
 })
 
-app.get('/liquidity_info', (req,res) => {
-    res.send(liquidity_settings);
+
+// TODO: Error handling when id is out of array
+app.get('/wallets/list/:id', (req, res) => {
+    const walletId = req.params.id;
+    const temp_wallet_obj = userWallets.find(wallet => wallet.id.toString() === walletId);
+    res.status(200).send(temp_wallet_obj);
 })
 
+
+
+
+// This runs the server
 app.listen(port, () => console.log(`Server listening on port ${port}!`));

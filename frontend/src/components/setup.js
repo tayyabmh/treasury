@@ -72,6 +72,10 @@ function Setup() {
                                     value={tokenTicker}
                                 />
                             </Form.Group>
+                            <Form.Group className='mb-3'>
+                                <Form.Label>Token Supply</Form.Label>
+                                <Form.Control defaultValue={"1,000,000,000"} disabled />
+                            </Form.Group>
                             <Button style={{minWidth: "150px"}} className='casama-primary' onClick={handleSubmit} disabled={deploying}>
                                 {!deploying? <span>Next</span> : <div><Spinner animation="border" size="sm" role="status"/><span> Loading...</span></div>}
                             </Button>

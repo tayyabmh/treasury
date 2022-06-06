@@ -73,10 +73,23 @@ function Dashboard() {
 
     return(
         <div>
-            <div style={{textAlign: 'left', marginLeft: "100px"}}>
-                <h1>Dashboard</h1>
-            </div>
             <Container>
+                <Row>
+                    <Col>
+                        <div style={{textAlign: 'left', marginLeft: "100px"}}>
+                            <h1>Token - {localStorage.getItem('tokenTicker')}</h1>
+                        </div>
+                    </Col>
+                    <Col>
+                        <Button variant="outline-primary" className="casama-outline" onClick={handleRefresh}>    
+                            <span>Refresh </span><i className={"fa-solid fa-arrows-rotate" + (refreshing ? " fa-spin" : "")}></i>
+                        </Button>
+                    </Col>
+                </Row>
+                
+                    
+            </Container>
+            <Container style={{textAlign: 'left'}}>
                 <Row>
                     <Col md={6}>
                         <h5>Token Price</h5>
@@ -93,13 +106,9 @@ function Dashboard() {
                             Recent Transactions
                         </h5>
                     </Col>
-                    <Col>
-                        <Button variant="outline-primary" className="casama-outline" onClick={handleRefresh}>    
-                            <span>Refresh </span><i className={"fa-solid fa-arrows-rotate" + (refreshing ? " fa-spin" : "")}></i>
-                        </Button>
-                    </Col>
+
                 </Row>
-                <Row>
+                <Row style={{textAlign: 'center'}}>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
@@ -132,7 +141,7 @@ function Dashboard() {
 
 function TokenPrice(props){
         return(
-            <AreaChart width={350} height={250} data={props.data} margin={{top: 10, right: 30, left: 0, bottom: 0}}>
+            <AreaChart width={450} height={350} data={props.data} margin={{top: 10, right: 30, left: 0, bottom: 0}}>
                                 <CartesianGrid strokeDasharray="3 3"/>
                                 <XAxis dataKey="index"/>
                                 <YAxis/>
@@ -144,7 +153,7 @@ function TokenPrice(props){
 
 function TokenDistribution(props){
     return(
-        <LineChart width={350} height={250} data={props.data}>
+        <LineChart width={450} height={350} data={props.data}>
             <CartesianGrid strokeDasharray="3 3"/>
             <XAxis dataKey="index"/>
             <YAxis/>

@@ -93,7 +93,7 @@ function Liquidity() {
                     <Col>
                         <h4>Pricing & Liquidity</h4>
                         <a href="/">How do Liquidity Pools work?</a>
-                        <img src='liquidity_explainer.jpeg' alt="uniswap liquidity explainer"width={450}/>
+                        <br/>
                         <p>
                             Your tokens price is determined by the current market rate, which is determined by it's relative value to an asset like the US Dollar.
                         </p>
