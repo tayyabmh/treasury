@@ -87,14 +87,14 @@ function Dashboard() {
                         <TokenDistribution data={distributionData}/>
                     </Col>
                 </Row>
-                <Row style={{marginTop: "16px"}}>
+                <Row style={{margin: "12px 0px"}}>
                     <Col>
                         <h5>
                             Recent Transactions
                         </h5>
                     </Col>
                     <Col>
-                        <Button variant="outline-primary" onClick={handleRefresh}>    
+                        <Button variant="outline-primary" className="casama-outline" onClick={handleRefresh}>    
                             <span>Refresh </span><i className={"fa-solid fa-arrows-rotate" + (refreshing ? " fa-spin" : "")}></i>
                         </Button>
                     </Col>

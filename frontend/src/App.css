@@ -44,3 +44,24 @@
   padding: 20px;
 }
 
+
+.header-subtext {
+  /* font-style: italic; */
+  color: rgb(90, 90, 90);
+}
+
+.casama-primary {
+  background-color: #f0544f !important;
+  border-color: #f0544f !important;
+}
+
+.casama-outline:hover {
+  background-color: #f0544f !important;
+  border-color:#f0544f !important;
+  color: #fff !important;
+}
+
+.casama-outline {
+  color: #f0544f !important;
+  border-color: #f0544f !important;
+}

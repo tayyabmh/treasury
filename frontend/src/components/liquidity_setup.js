@@ -40,10 +40,13 @@ function Liquidity() {
 
     return(
         <div style={{textAlign: 'left'}}>
-            <Row style={{margin: "20px 105px"}}>
-            <h1>Initial Token Pricing</h1>
-            </Row>
             <Container>
+            <Row>
+                <h1>Initial Token Pricing</h1>
+            </Row>
+            </Container>
+            
+            <Container style={{marginTop: "16px"}}>
                 <Row>
                     <Col>
                         <Form>
@@ -81,16 +84,16 @@ function Liquidity() {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group>
-                                <Button onClick={handleLiquiditySet} style={{minWidth: "150px"}} disabled={deploying}>
+                                <Button onClick={handleLiquiditySet} className="casama-primary" style={{minWidth: "150px"}} disabled={deploying}>
                                     {!deploying ? <span>Set</span> : <div><Spinner animation="border" size="sm" role="status"/><span> Loading...</span></div>}
                                 </Button>
                             </Form.Group>
                         </Form>
                     </Col>
                     <Col>
-                        <h3>Pricing & Liquidity</h3>
-                        <a href="/">Link to docs explaining how this works</a>
-                        <img src='liquidity_explainer.jpeg' alt="uniswap liquidity explainer"width={576}/>
+                        <h4>Pricing & Liquidity</h4>
+                        <a href="/">How do Liquidity Pools work?</a>
+                        <img src='liquidity_explainer.jpeg' alt="uniswap liquidity explainer"width={450}/>
                         <p>
                             Your tokens price is determined by the current market rate, which is determined by it's relative value to an asset like the US Dollar.
                         </p>
@@ -100,9 +103,6 @@ function Liquidity() {
                         
                         <p>
                             We recommend adding in 10% of total tokens into a liquidity pool, along with a beginning base price for the token. For example, 1,000,000 tokens backed with $10,000 for a base price of $0.10 / token.
-                        </p>
-                        <p>
-                            This is just an example, the specifics for your token can be different.
                         </p>
                     </Col>
                 </Row>

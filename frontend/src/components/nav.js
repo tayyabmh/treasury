@@ -9,7 +9,7 @@ import {
 
 function NavigationSidebar() {
     return (
-            <Navbar  bg="dark" variant="dark" style={{marginBottom: "10px"}} >
+            <Navbar variant="dark" bg="dark" style={{marginBottom: "10px"}} >
             <Container>
                 <Navbar.Brand href="/">Casama</Navbar.Brand>
                 <Nav className="me-auto">

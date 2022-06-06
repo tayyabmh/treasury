@@ -41,7 +41,16 @@ function Setup() {
 
     return(
         <div style={{textAlign: 'left'}}>
-            <Row style={{margin: "20px 105px"}}><h1>Token Setup</h1></Row>
+            <Container>
+                <Row className='mb-3'>
+                    <Col>
+                        <h1>Token Setup</h1>
+                        <p className='header-subtext'>Let's get started by naming your token and ticker symbol</p>
+                    </Col>
+                    <Col/>
+                </Row>
+            </Container>
+            
 
             <Container>
                 <Row>
@@ -63,22 +72,21 @@ function Setup() {
                                     value={tokenTicker}
                                 />
                             </Form.Group>
-                            <Button style={{minWidth: "150px"}} onClick={handleSubmit} disabled={deploying}>
+                            <Button style={{minWidth: "150px"}} className='casama-primary' onClick={handleSubmit} disabled={deploying}>
                                 {!deploying? <span>Next</span> : <div><Spinner animation="border" size="sm" role="status"/><span> Loading...</span></div>}
                             </Button>
                         </Form>
                     </Col>
                     <Col>
-                        <h3>Information</h3>
+                        <h4>Information</h4>
                         <p>
-                            Currently, this will only be deployed in the Rinkeby testnet, so feel free to test around as much as you'd like.
-                            We will work with you for your mainnet launch.
+                            Selecting a token name and ticker is important for your community to easily identify the networks token. It usually also represents something meaningful specific to the community. So, choose wisely :)
                         </p>
                         <p>
-                            Your token supply will be limited to 1 Billion.
+                            Your token will be limited to a supply of 1 Billion tokens. It is easier to manage a capped supply token than a variable one.
                         </p>
                         <p>
-                            After naming your token, and it's ticker we will set you up with a) a secure Treasury contract, b) your very own token, c) get you to next steps on setting an important Liquidity Pool.
+                            Don't worry about this too much today, you will be able to change this before going into live into Production. Next steps will be to setup a liquidity pool (more on that soon).
                         </p>
                     </Col>
                 </Row>
