@@ -19,6 +19,7 @@ function NavigationSidebar() {
                   <Nav.Link href="/liquidity">Liquidity</Nav.Link>
                   <Nav.Link href="/wallets">Wallets</Nav.Link>
                   <Nav.Link href="/manage_token">Token</Nav.Link>
+                  <Nav.Link href="/incentives">Incentives</Nav.Link>
                     {/* <Nav.Link href="/admin">Admin</Nav.Link>
                     <Nav.Link href="/contribute">Contribute</Nav.Link>
                     <Nav.Link href="/incentive">Incentivize</Nav.Link>
