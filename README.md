@@ -25,3 +25,5 @@ Any feature work should be worked on a branch that is named `feature/NAME_OF_FEA
 Any bug fixes work should be worked on a branch that is named `hotfix/QUICK_BUG_DETAIL`
 
 !! Do not merge directly to main, create a merge request in `development` and it will be tested before any production merges.
+
+Start your work from the `development` branch as well.
