@@ -26,4 +26,4 @@ Any bug fixes work should be worked on a branch that is named `hotfix/QUICK_BUG_
 
 !! Do not merge directly to main, create a merge request in `dev` and it will be tested before any production merges.
 
-Start your work from the `development` branch as well.
+Start your work from the `dev` branch as well.
