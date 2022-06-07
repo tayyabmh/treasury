@@ -37,7 +37,8 @@ let userWallets = [
         name: "Greg Thompson",
         email: "greg.thompson@gmail.com",
         walletAddress: ethers.Wallet.createRandom().address,
-        tokenHoldings: 10
+        tokenHoldings: 10,
+        cashHoldings: 0
     }
 ]
 
@@ -148,6 +149,7 @@ app.post('/token/sell/:id', (req,res) => {
         LP_USD_token = K / LP_marketplace_token;
         let userPayout = prevUSDAmount - LP_USD_token;
         tokenPrice = LP_USD_token/LP_marketplace_token;
+        tempWallet.cashHoldings += userPayout;
 
         let newPriceData = {
             index: PDIndex,
@@ -176,11 +178,15 @@ app.get('/token/circulating_supply', (req,res) => {
 
 app.post('/token/purchase', (req, res) => {
     const purchaseAmount = req.body.purchaseAmount;
+    const walletId = req.body.id;
+    let tempWallet = userWallets.find(wallet => wallet.id.toString() === walletId);
+
     LP_USD_token += purchaseAmount;
     let prevTokenAmount = LP_marketplace_token;
     LP_marketplace_token = K / LP_USD_token;
     let tokenPurchaseQuantity = prevTokenAmount - LP_marketplace_token;
     tokenPrice = LP_USD_token/LP_marketplace_token;
+    tempWallet.tokenHoldings += purchaseAmount;
 
     let newPriceData = {
         index: PDIndex,
@@ -211,7 +217,8 @@ app.post('/wallets/create', (req, res) => {
         name: wallet.name,
         email: wallet.email,
         walletAddress: ethers.Wallet.createRandom().address,
-        tokenHoldings: 0
+        tokenHoldings: 0,
+        cashHoldings: 0
     }
     userWallets.push(temp_wallet_obj);
     
