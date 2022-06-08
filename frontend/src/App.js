@@ -25,6 +25,7 @@ import Liquidity from './components/liquidity_setup';
 import LiquidityInitialization from './components/liquiduity_initialize';
 import Wallets from './components/wallets';
 import TokenManagement from './components/token_manage';
+import Incentives from './components/incentives';
 
 const { chains, provider } = configureChains(
   [chain.hardhat],
@@ -59,6 +60,7 @@ class App extends React.Component {
               <Route path='/liquidity_init' element={<LiquidityInitialization/>}/>
               <Route path='/wallets' element={<Wallets/>}/>
               <Route path='/manage_token' element={<TokenManagement />}/>
+              <Route path='/incentives' element={<Incentives />}/>
               {/* <Route path="/govern" element={<Governance />} /> */}
             </Routes>
           </div>

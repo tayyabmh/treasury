@@ -57,12 +57,21 @@ let TokenDistributionData = [
     }
 ]
 
+let incentiveList = [
+    {
+        id: 0,
+        type: 'Referrals',
+        reward: 20
+    }
+]
+
 let transactions_log = [];
 
 // Needed indices to manage ongoing lists
 let UWindex = 2; // User Wallet Index
 let PDIndex = 1; // Price Date Index
 let TDindex = 1; // Token Distribution Index
+let ILindex = 1; // Incentives List Index
 
 function logTransaction(transactions_log, recentTransaction) {
     return transactions_log.push(recentTransaction);
@@ -94,6 +103,52 @@ app.get('/token_info', (req,res) => {
 
 app.get('/liquidity_info', (req,res) => {
     res.send(liquidity_settings);
+})
+
+// INCENTIVES ENDPOINTS
+app.get('/incentives/list', (req,res) => {
+    res.status(200).send(incentiveList);
+})
+
+app.post('/incentives/create', (req,res) => {
+    const newIncentive = req.body;
+    incentiveList.push({
+        id: ILindex,
+        type: newIncentive.type,
+        reward: newIncentive.reward
+    });
+    ILindex++;
+    res.status(200).send(incentiveList);
+})
+
+app.post('/incentives/trigger', (req,res) => {
+    const trigger = req.body;
+    console.log(trigger);
+    let tempWallet = userWallets.find(wallet => wallet.id === trigger.user)
+    console.log(tempWallet)
+    let triggeredReward = incentiveList.find(incentive => incentive.type === trigger.type)
+    tempWallet.tokenHoldings += triggeredReward.reward;
+
+    let recentTransaction = {
+        "to": tempWallet.name,
+        "type": "INCENTIVE_REWARD",
+        "amount": triggeredReward.reward,
+        "time": Date.now()
+    }
+
+    logTransaction(transactions_log, recentTransaction);
+
+    console.log(TokenDistributionData[TDindex -1].expected)
+    let distributionDataPoint = {
+        index: TDindex,
+        expected: TokenDistributionData[TDindex - 1].expected + 50,
+        actual: TokenDistributionData[TDindex - 1].actual + triggeredReward.reward
+    }
+
+    TokenDistributionData.push(distributionDataPoint);
+    TDindex++;
+
+    res.status(200).send("Reward triggered!");
 })
 
 // TOKEN ENDPOINTS

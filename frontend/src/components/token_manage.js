@@ -66,6 +66,24 @@ function Dashboard() {
                     console.error(err);
                 })
         }
+        client.get('/token/pricedata')
+            .then(res => {
+                console.log(res.data);
+                setPriceData(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            })
+
+        client.get('/token/distributionData')
+            .then(res => {
+                console.log(res.data);
+                setDistributionData(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            })
+
     }, [recentTransactions.length])
 
 
