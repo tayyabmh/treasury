@@ -127,6 +127,26 @@ app.post('/incentives/trigger', (req,res) => {
     console.log(tempWallet)
     let triggeredReward = incentiveList.find(incentive => incentive.type === trigger.type)
     tempWallet.tokenHoldings += triggeredReward.reward;
+
+    let recentTransaction = {
+        "to": tempWallet.name,
+        "type": "INCENTIVE_REWARD",
+        "amount": triggeredReward.reward,
+        "time": Date.now()
+    }
+
+    logTransaction(transactions_log, recentTransaction);
+
+    console.log(TokenDistributionData[TDindex -1].expected)
+    let distributionDataPoint = {
+        index: TDindex,
+        expected: TokenDistributionData[TDindex - 1].expected + 50,
+        actual: TokenDistributionData[TDindex - 1].actual + triggeredReward.reward
+    }
+
+    TokenDistributionData.push(distributionDataPoint);
+    TDindex++;
+
     res.status(200).send("Reward triggered!");
 })
 
