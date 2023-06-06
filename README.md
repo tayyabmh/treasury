@@ -1,5 +1,7 @@
 # treasury
 
+_This was an MVP that was built for Casama's very first product that was designed to help Marketplaces to launch an incentive token._
+
 ## How to launch Frontend
 `npm install`*
 
