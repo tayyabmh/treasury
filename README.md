@@ -1,7 +1,5 @@
 # treasury
 
-Trello to manage work: https://trello.com/b/o1azRgfw/kasama-code-improvements
-
 ## How to launch Frontend
 `npm install`*
 
